@@ -59,7 +59,7 @@ defmodule Alef do
     arq = File.open!(System.user_home() <> "/UnicodeData.txt")
     consulta = Enum.join(argv, " ") |> String.upcase
     listar(arq, consulta)
-    |> Enum.map(&formatar/1)
+    |> Stream.map(&formatar/1)
     |> Enum.join("\n")
     |> IO.puts
   end
