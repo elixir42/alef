@@ -52,14 +52,12 @@ defmodule Alef do
     codigo = codigo
           |> Integer.to_string(16)
           |> String.rjust(4, ?0)
-    codigo = "U+" <> codigo
-    "#{codigo}\t#{runa}\t#{nome}"
+    "U+#{codigo}\t#{runa}\t#{nome}"
   end
 
   def main(argv) do
     arq = File.open!(System.user_home() <> "/UnicodeData.txt")
-    consulta = Enum.join(argv, " ")
-            |> String.upcase
+    consulta = Enum.join(argv, " ") |> String.upcase
     listar(arq, consulta)
     |> Enum.map(&formatar/1)
     |> Enum.join("\n")
