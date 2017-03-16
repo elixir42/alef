@@ -3,15 +3,14 @@ defmodule Alef.Runes do
   analisar_linha/1
   """
   def analisar_linha(linha) do
-    fields = String.split(linha, ";")
-    [code, name | _rest] = fields
-    alt_name = Enum.at(fields, 10)
-
-    name = rune_name(name, alt_name)
-    palavras = tokenizar(name <> " " <> alt_name)
+    campos = String.split(linha, ";")
+    [code, nome | _rest] = campos
+    nome_alt = Enum.at(campos, 10)
+    palavras = tokenizar(nome <> " " <> nome_alt)
+    nome = rune_name(nome, nome_alt)
     runa = code_to_rune(code)
 
-    {runa, name, palavras}
+    {runa, nome, palavras}
   end
 
   def tokenizar(texto) do
@@ -32,10 +31,10 @@ defmodule Alef.Runes do
     if (linha == :eof) do
       Enum.reverse(resultados)
     else
-      {runa, name, palavras} = analisar_linha(linha)
+      {runa, nome, palavras} = analisar_linha(linha)
 
       if MapSet.subset?(consulta, palavras) do
-        listar_rec(arq, consulta, [{runa, name}|resultados])
+        listar_rec(arq, consulta, [{runa, nome}|resultados])
       else
         listar_rec(arq, consulta, resultados)
       end
@@ -49,7 +48,7 @@ defmodule Alef.Runes do
     end
   end
 
-  defp rune_name(name, ""), do: name
-  defp rune_name(name, alt_name), do: "#{name} (#{alt_name})"
+  defp rune_name(nome, ""), do: nome
+  defp rune_name(nome, nome_alt), do: "#{nome} (#{nome_alt})"
 
 end
