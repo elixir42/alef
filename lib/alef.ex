@@ -57,12 +57,11 @@ defmodule Alef do
   end
 
   def abrir_UCD(caminho) do
-    case File.open(caminho) do
-      {:ok, arq} -> arq
-      {:error, :enoent} -> Alef.Cliente.get(caminho)
-                        |> StringIO.open
-                        |> elem(1)
+    unless File.exists?(caminho) do
+      Alef.Cliente.get(caminho)
     end
+
+    File.open!(caminho)
   end
 
   def main(argv) do
@@ -73,6 +72,8 @@ defmodule Alef do
     |> Stream.map(&formatar/1)
     |> Enum.join("\n")
     |> IO.puts
+
+    File.close(arq)
   end
 
 end
