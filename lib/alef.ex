@@ -32,8 +32,9 @@ defmodule Alef do
     listar_rec(arq, consulta, [])
   end
 
-  def listar_rec(arq, consulta, resultados) do
+  defp listar_rec(arq, consulta, resultados) do
     linha = IO.read(arq, :line)
+    #IO.puts(">" <> linha)
     if (linha == :eof) do
       Enum.reverse(resultados)
     else
@@ -55,8 +56,18 @@ defmodule Alef do
     "U+#{codigo}\t#{runa}\t#{nome}"
   end
 
+  def abrir_UCD(caminho) do
+    case File.open(caminho) do
+      {:ok, arq} -> arq
+      {:error, :enoent} -> Alef.Cliente.get(caminho)
+                        |> StringIO.open
+                        |> elem(1)
+    end
+  end
+
   def main(argv) do
-    arq = File.open!(System.user_home() <> "/UnicodeData.txt")
+    caminho = System.user_home() <> "/UnicodeData.txt"
+    arq = abrir_UCD(caminho)
     consulta = Enum.join(argv, " ") |> String.upcase
     listar(arq, consulta)
     |> Stream.map(&formatar/1)
