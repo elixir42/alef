@@ -3,17 +3,15 @@ defmodule Alef.Runes do
   analisar_linha/1
   """
   def analisar_linha(linha) do
-    campos = String.split(linha, ";")
-    [codigo, nome | _] = campos
-    nome_alt = Enum.at(campos, 10)
-    palavras = tokenizar(nome <> " " <> nome_alt)
-    nome = if nome_alt == "", do: nome, else: "#{nome} (#{nome_alt})"
-    runa = try do
-             <<String.to_integer(codigo, 16)::utf8>>
-           rescue
-             ArgumentError -> " "
-           end
-    {runa, nome, palavras}
+    fields = String.split(linha, ";")
+    [code, name | _rest] = fields
+    alt_name = Enum.at(fields, 10)
+
+    name = rune_name(name, alt_name)
+    palavras = tokenizar(name <> " " <> alt_name)
+    runa = code_to_rune(code)
+
+    {runa, name, palavras}
   end
 
   def tokenizar(texto) do
@@ -34,13 +32,24 @@ defmodule Alef.Runes do
     if (linha == :eof) do
       Enum.reverse(resultados)
     else
-      {runa, nome, palavras} = analisar_linha(linha)
+      {runa, name, palavras} = analisar_linha(linha)
+
       if MapSet.subset?(consulta, palavras) do
-        listar_rec(arq, consulta, [{runa, nome}|resultados])
+        listar_rec(arq, consulta, [{runa, name}|resultados])
       else
         listar_rec(arq, consulta, resultados)
       end
     end
   end
+
+  defp code_to_rune(code) do
+    try do
+      <<String.to_integer(code, 16)::utf8>>
+    rescue ArgumentError -> " "
+    end
+  end
+
+  defp rune_name(name, ""), do: name
+  defp rune_name(name, alt_name), do: "#{name} (#{alt_name})"
 
 end
