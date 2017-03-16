@@ -3,77 +3,34 @@ defmodule Alef do
   Documentation for Alef.
   """
 
+  alias Alef.Runes
+
+  def format_rune({rune, name}) do
+    <<utf_code::utf8>> = rune
+
+    code =
+      utf_code
+      |> Integer.to_string(16)
+      |> String.rjust(4, ?0)
+    "U+#{code}\t#{rune}\t#{name}"
+  end
+
   @doc """
-  analisar_linha/1
+  Steps to be taken:
+
+  0) Parse in params
+  1) Get the file to read (FileHandler is responsible for checking that and getting a new one if necessary)
+  2) Send all to a parser, so it can parse an find found data
+  3) Displays it
   """
-  def analisar_linha(linha) do
-    campos = String.split(linha, ";")
-    [codigo, nome] = Enum.slice(campos, 0..1)
-    nome_alt = Enum.at(campos, 10)
-    palavras = tokenizar(nome <> " " <> nome_alt)
-    nome = if nome_alt == "", do: nome, else: "#{nome} (#{nome_alt})"
-    runa = try do
-             <<String.to_integer(codigo, 16)::utf8>>
-           rescue
-             ArgumentError -> " "
-           end
-    {runa, nome, palavras}
-  end
-
-  def tokenizar(texto) do
-    texto
-    |> String.replace("-", " ")
-    |> String.split
-    |> MapSet.new
-  end
-
-  def listar(arq, consulta) do
-    consulta = tokenizar(consulta)
-    listar_rec(arq, consulta, [])
-  end
-
-  defp listar_rec(arq, consulta, resultados) do
-    linha = IO.read(arq, :line)
-    #IO.puts(">" <> linha)
-    if (linha == :eof) do
-      Enum.reverse(resultados)
-    else
-      {runa, nome, palavras} = analisar_linha(linha)
-      if MapSet.subset?(consulta, palavras) do
-        listar_rec(arq, consulta, [{runa, nome}|resultados])
-      else
-        listar_rec(arq, consulta, resultados)
-      end
-    end
-  end
-
-  def formatar(runa_nome) do
-    {runa, nome} = runa_nome
-    <<codigo::utf8>> = runa
-    codigo = codigo
-          |> Integer.to_string(16)
-          |> String.rjust(4, ?0)
-    "U+#{codigo}\t#{runa}\t#{nome}"
-  end
-
-  def abrir_UCD(caminho) do
-    unless File.exists?(caminho) do
-      Alef.Cliente.get(caminho)
-    end
-
-    File.open!(caminho)
-  end
-
   def main(argv) do
-    caminho = System.user_home() <> "/UnicodeData.txt"
-    arq = abrir_UCD(caminho)
-    consulta = Enum.join(argv, " ") |> String.upcase
-    listar(arq, consulta)
-    |> Stream.map(&formatar/1)
-    |> Enum.join("\n")
-    |> IO.puts
+    args = Enum.join(argv, " ") |> String.upcase() # 0
+    file = Alef.FileHandler.read() # 1
 
-    File.close(arq)
+    Runes.listar(file, args) # 2
+    |> Stream.map(&format_rune/1) # 3
+    |> Enum.join("\n")
+    |> IO.puts()
   end
 
 end
