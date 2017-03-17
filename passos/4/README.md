@@ -1,31 +1,41 @@
-# Passo 3
+# Passo 4
 
-Criar testes para `listar` e implementar as funcionalidades necessárias:
+Criar função `main` e fazê-la exibir os argumentos da linha de comando convertidos em caixa alta.
 
-* Consulta de uma palavra, devolvendo uma linha
-* Consulta de uma palavra, devolvendo duas linhas
-* Consulta de duas palavras, devolvendo três linhas
+## Instruções
 
-## Dica
+Um programa executável pela linha de comando em Elixir depende do programa [`enscript`](http://erlang.org/doc/man/escript.html) que vem na distribuição padrão de Erlang. O `enscript` executa um binário compilado de BEAM (a VM de Erlang).
 
-Para ver as descrições dos testes passando:
+Para o binário de `enscript` ser gerado corretamente, é preciso incluir uma linha no arquivo `mix.exs` na raiz do seu projeto (`alef/`). Veja o comentário marcado com ➊:
 
-```bash
-$ mix test --trace
+```elixir
+defmodule Alef.Mixfile do
+  use Mix.Project
 
-AlefTest
-  * test analisar linha de UnicodeData.txt com hífen (3.0ms)
-  * test analisar linha simples de UnicodeData.txt (0.05ms)
-  * test analisar linha de UnicodeData.txt com hífen e campo 10 (0.06ms)
-  * test consulta duas palavras, três linhas (3.3ms)
-  * test consulta uma palavra, duas linhas (0.2ms)
-  * test consulta uma palavra, uma linha (0.1ms)
+  def project do
+    [app: :alef,
+     version: "0.1.0",
+     elixir: "~> 1.4",
+     build_embedded: Mix.env == :prod,
+     start_permanent: Mix.env == :prod,
+     escript: [main_module: Alef], # ➊ declara módulo principal
+     deps: deps()]
+  end
 
-
-Finished in 0.09 seconds
-6 tests, 0 failures
-
-Randomized with seed 791882
+  # mais linhas omitidas...
+end
 ```
 
-Note que a ordem de execução dos testes não é previsível e provavelmente vai mudar a cada sessão de `mix test`.
+Em seguida, você compila o projeto e gera o executável com este comando:
+
+
+```bash
+$ mix escript.build
+```
+
+Será gerado um executável com o nome do projeto, `alef`, que você pode rodar:
+
+```bash
+$ ./alef um dois três
+UM DOIS TRÊS
+```

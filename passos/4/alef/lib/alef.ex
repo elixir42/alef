@@ -47,4 +47,11 @@ defmodule Alef do
     end
   end
 
+  def main(argv) do
+    argv
+    |> Enum.join(" ")
+    |> String.upcase
+    |> IO.puts
+  end
+
 end
