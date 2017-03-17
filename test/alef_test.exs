@@ -7,20 +7,20 @@ defmodule AlefTest do
   test "analisar linha simples de UnicodeData.txt" do
     letra_A = "0041;LATIN CAPITAL LETTER A;Lu;0;L;;;;;N;;;;0061;"
     palavras = MapSet.new(["A", "CAPITAL", "LATIN", "LETTER"])
-    assert {"A", "LATIN CAPITAL LETTER A", ^palavras} = analisar_linha(letra_A)
+    assert {"0041", "A", "LATIN CAPITAL LETTER A", ^palavras} = analisar_linha(letra_A)
   end
 
   test "analisar linha de UnicodeData.txt com hífen" do
     hifen = "002D;HYPHEN-MINUS;Pd;0;ES;;;;;N;;;;;"
     palavras = MapSet.new(["HYPHEN", "MINUS"])
-    assert {"-", "HYPHEN-MINUS", ^palavras} = analisar_linha(hifen)
+    assert {"002D", "-", "HYPHEN-MINUS", ^palavras} = analisar_linha(hifen)
   end
 
   test "analisar linha de UnicodeData.txt com hífen e campo 10" do
     apostrofe = "0027;APOSTROPHE;Po;0;ON;;;;;N;APOSTROPHE-QUOTE;;;"
     nome = "APOSTROPHE (APOSTROPHE-QUOTE)"
     palavras = MapSet.new(["APOSTROPHE", "QUOTE"])
-    assert {"'", ^nome, ^palavras} = analisar_linha(apostrofe)
+    assert {"0027", "'", ^nome, ^palavras} = analisar_linha(apostrofe)
   end
 
   @linhas_3d_a_43 """
@@ -35,19 +35,19 @@ defmodule AlefTest do
 
   test "consulta uma palavra, uma linha" do
     {:ok, arq} = StringIO.open(@linhas_3d_a_43)
-    assert [{"?", "QUESTION MARK"}] = listar(arq, "MARK")
+    assert [{"003F", "?", "QUESTION MARK"}] = listar(arq, "MARK")
   end
 
   test "consulta uma palavra, duas linhas" do
     {:ok, arq} = StringIO.open(@linhas_3d_a_43)
-    assert [{"=", "EQUALS SIGN"}, {">", "GREATER-THAN SIGN"}] = listar(arq, "SIGN")
+    assert [{"003D", "=", "EQUALS SIGN"}, {"003E", ">", "GREATER-THAN SIGN"}] = listar(arq, "SIGN")
   end
 
   test "consulta duas palavras, três linhas" do
     {:ok, arq} = StringIO.open(@linhas_3d_a_43)
-    assert [{"A", "LATIN CAPITAL LETTER A"},
-            {"B", "LATIN CAPITAL LETTER B"},
-            {"C", "LATIN CAPITAL LETTER C"}] = listar(arq, "CAPITAL LATIN")
+    assert [{"0041", "A", "LATIN CAPITAL LETTER A"},
+            {"0042", "B", "LATIN CAPITAL LETTER B"},
+            { "0043","C", "LATIN CAPITAL LETTER C"}] = listar(arq, "CAPITAL LATIN")
   end
 
 

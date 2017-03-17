@@ -5,16 +5,8 @@ defmodule Alef do
 
   alias Alef.Runas
 
-  def formatar_runa({runa, nome}) do
-
-    codigo_fmt =
-      runa
-      |> List.first()
-      |> Integer.to_string()
-      |> String.rjust(4, ?0)
-
-    "U+#{codigo_fmt}\t#{runa}\t#{nome}"
-  end
+  def formatar_runa({codigo, runa, nome}),
+    do: "U+#{codigo}\t#{runa}\t#{nome}"
 
   @doc """
   Passos:

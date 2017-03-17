@@ -9,8 +9,13 @@ defmodule Alef.Runas do
     palavras = tokenizar(nome <> " " <> nome_alt)
     nome = nome_completo(nome, nome_alt)
     runa = [codigo |> String.to_integer(16)]
+           |> :unicode.characters_to_binary()
+           |> case do
+                {:error, unicode, _} -> unicode
+                unicode -> unicode
+              end
 
-    {runa, nome, palavras}
+    {codigo, runa, nome, palavras}
   end
 
   def tokenizar(texto) do
@@ -34,10 +39,10 @@ defmodule Alef.Runas do
     if (linha == :eof) do
       Enum.reverse(resultados)
     else
-      {runa, nome, palavras} = analisar_linha(linha)
+      {codigo, runa, nome, palavras} = analisar_linha(linha)
 
       if MapSet.subset?(consulta, palavras) do
-        listar_rec(arq, consulta, [{runa, nome}|resultados])
+        listar_rec(arq, consulta, [{codigo, runa, nome}|resultados])
       else
         listar_rec(arq, consulta, resultados)
       end
