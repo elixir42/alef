@@ -2,7 +2,7 @@ defmodule AlefTest do
   use ExUnit.Case
   doctest Alef
 
-  import Alef, only: [ analisar_linha: 1, listar: 2 ]
+  import Alef, only: [ analisar_linha: 1, listar: 2, formatar: 1]
 
   test "analisar linha simples de UnicodeData.txt" do
     letra_A = "0041;LATIN CAPITAL LETTER A;Lu;0;L;;;;;N;;;;0061;"
@@ -56,6 +56,16 @@ defmodule AlefTest do
     assert [{"A", "LATIN CAPITAL LETTER A"},
             {"B", "LATIN CAPITAL LETTER B"},
             {"C", "LATIN CAPITAL LETTER C"}] = listar(arq, "CAPITAL LATIN")
+  end
+
+  test "formatar resultado simples" do
+    assert "U+0041\tA\tLATIN CAPITAL LETTER A" =
+      formatar({"A", "LATIN CAPITAL LETTER A"})
+  end
+
+  test "formatar resultado que não é caractere" do
+    assert "???" =
+      formatar({<<0xfffd::utf8>>, "<Non Private Use High Surrogate, Last>"})
   end
 
 

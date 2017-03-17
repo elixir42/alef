@@ -58,6 +58,14 @@ defmodule Alef do
 
   def caminho_UCD, do: System.user_home() <> "/UnicodeData.txt"
 
+  def formatar({runa, nome}) do
+    <<codigo::utf8>> = runa
+    codigo_fmt = codigo
+              |> Integer.to_string(16)
+              |> String.rjust(4, ?0)
+    "U+#{codigo_fmt}\t#{runa}\t#{nome}"
+  end
+
   def main(argv) do
     consulta = argv
             |> Enum.join(" ")
