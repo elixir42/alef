@@ -20,10 +20,12 @@ defmodule Alef.Runas do
     |> MapSet.new
   end
 
-  defp runa_de_codigo(codigo) do
+  defp runa_de_codigo(codigo_str) do
+    codigo = String.to_integer(codigo_str, 16)
     try do
-      <<String.to_integer(codigo, 16)::utf8>>
-    rescue ArgumentError -> " "
+      <<codigo::utf8>>
+    rescue
+      ArgumentError -> " "
     end
   end
 
