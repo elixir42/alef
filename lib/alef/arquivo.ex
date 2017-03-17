@@ -10,11 +10,7 @@ defmodule Alef.Arquivo do
       # @JL: use debug, so it will only print on dev env
       # this way the programs follows Unix Philosophy
       Logger.debug("#{caminho_UCD()} não encontrado, baixando...")
-
       %{body: dados} = Alef.Unicode.baixar()
-
-      Logger.debug("Download concluído.")
-
       caminho_UCD()
       |> salvar(dados)
     end

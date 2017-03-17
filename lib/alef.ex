@@ -5,14 +5,15 @@ defmodule Alef do
 
   alias Alef.Runas
 
-  def format_rune({rune, name}) do
-    <<utf_code::utf8>> = rune
+  def formatar_runa({runa, nome}) do
+    <<codigo::utf8>> = runa
 
-    code =
-      utf_code
+    codigo_fmt =
+      codigo
       |> Integer.to_string(16)
       |> String.rjust(4, ?0)
-    "U+#{code}\t#{rune}\t#{name}"
+
+    "U+#{codigo_fmt}\t#{runa}\t#{nome}"
   end
 
   @doc """
@@ -28,7 +29,7 @@ defmodule Alef do
     ucd = Alef.Arquivo.ler() # 1
 
     Runas.listar(ucd, consulta) # 2
-    |> Stream.map(&format_rune/1) # 3
+    |> Stream.map(&formatar_runa/1) # 3
     |> Enum.join("\n")
     |> IO.puts()
   end
