@@ -1,22 +1,22 @@
 require Logger
 
-defmodule Alef.FileHandler do
+defmodule Alef.Arquivo do
   def caminho_UCD do
     System.user_home() <> "/UnicodeData.txt"
   end
 
-  def read do
+  def ler do
     unless existe_UCD?() do
       # @JL: use debug, so it will only print on dev env
       # this way the programs follows Unix Philosophy
-      Logger.debug("No unicode_data found, downloading...")
+      Logger.debug("#{caminho_UCD()} não encontrado, baixando...")
 
-      %{body: dados} = Alef.Unicode.data()
+      %{body: dados} = Alef.Unicode.baixar()
 
-      Logger.debug("Download finished\n")
+      Logger.debug("Download concluído.")
 
       caminho_UCD()
-      |> save_file(dados)
+      |> salvar(dados)
     end
 
     caminho_UCD()
@@ -28,10 +28,10 @@ defmodule Alef.FileHandler do
     |> File.exists?()
   end
 
-  def save_file(caminho, dados) do
-    with {:ok, file} <- File.open(caminho, [:write]) do
-      file |> IO.binwrite(dados)
-      file |> File.close()
+  def salvar(caminho, dados) do
+    with {:ok, arq} <- File.open(caminho, [:write]) do
+      arq |> IO.binwrite(dados)
+      arq |> File.close()
     else
       _ -> exit(:file_err)
     end

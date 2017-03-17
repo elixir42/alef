@@ -6,7 +6,7 @@ defmodule Alef.Unicode do
 
   adapter Tesla.Adapter.Ibrowse
 
-  def data() do
+  def baixar() do
     get("/Public/UNIDATA/UnicodeData.txt")
   end
 end

@@ -1,14 +1,14 @@
-defmodule Alef.Runes do
+defmodule Alef.Runas do
   @doc """
   analisar_linha/1
   """
   def analisar_linha(linha) do
     campos = String.split(linha, ";")
-    [code, nome | _rest] = campos
+    [codigo, nome | _rest] = campos
     nome_alt = Enum.at(campos, 10)
     palavras = tokenizar(nome <> " " <> nome_alt)
-    nome = rune_name(nome, nome_alt)
-    runa = code_to_rune(code)
+    nome = nome_completo(nome, nome_alt)
+    runa = runa_de_codigo(codigo)
 
     {runa, nome, palavras}
   end
@@ -19,6 +19,16 @@ defmodule Alef.Runes do
     |> String.split
     |> MapSet.new
   end
+
+  defp runa_de_codigo(codigo) do
+    try do
+      <<String.to_integer(codigo, 16)::utf8>>
+    rescue ArgumentError -> " "
+    end
+  end
+
+  defp nome_completo(nome, ""), do: nome
+  defp nome_completo(nome, nome_alt), do: "#{nome} (#{nome_alt})"
 
   def listar(arq, consulta) do
     consulta = tokenizar(consulta)
@@ -40,15 +50,5 @@ defmodule Alef.Runes do
       end
     end
   end
-
-  defp code_to_rune(code) do
-    try do
-      <<String.to_integer(code, 16)::utf8>>
-    rescue ArgumentError -> " "
-    end
-  end
-
-  defp rune_name(nome, ""), do: nome
-  defp rune_name(nome, nome_alt), do: "#{nome} (#{nome_alt})"
 
 end

@@ -1,9 +1,9 @@
 defmodule Alef do
   @moduledoc """
-  Documentation for Alef.
+  Documentação de Alef.
   """
 
-  alias Alef.Runes
+  alias Alef.Runas
 
   def format_rune({rune, name}) do
     <<utf_code::utf8>> = rune
@@ -16,18 +16,18 @@ defmodule Alef do
   end
 
   @doc """
-  Steps to be taken:
+  Passos:
 
-  0) Parse in params
-  1) Get the file to read (FileHandler is responsible for checking that and getting a new one if necessary)
-  2) Send all to a parser, so it can parse an find found data
-  3) Displays it
+  0) Analisar argumentos da linha de comando
+  1) Ler o arquivo UCD (Arquivo cuida de encontrar ou baixar se necessário)
+  2) Envia UCD e consulta para função que monta a lista de resultados
+  3) Formata e exibe os resultados
   """
   def main(argv) do
-    args = Enum.join(argv, " ") |> String.upcase() # 0
-    file = Alef.FileHandler.read() # 1
+    consulta = Enum.join(argv, " ") |> String.upcase() # 0
+    ucd = Alef.Arquivo.ler() # 1
 
-    Runes.listar(file, args) # 2
+    Runas.listar(ucd, consulta) # 2
     |> Stream.map(&format_rune/1) # 3
     |> Enum.join("\n")
     |> IO.puts()
