@@ -24,6 +24,13 @@ defmodule AlefTest do
     assert {"'", ^nome, ^palavras} = analisar_linha(apostrofe)
   end
 
+  test "analisar linha com codepoint que não é caractere" do
+    surrogate = "DB7F;<Non Private Use High Surrogate, Last>;Cs;0;L;;;;;N;;;;;"
+    assert {<<0xfffd::utf8>>, "<Non Private Use High Surrogate, Last>", _} =
+      analisar_linha(surrogate)
+    # o caractere devolvido é: U+FFFD � REPLACEMENT CHARACTER
+  end
+
   @linhas_3d_a_43 """
   003D;EQUALS SIGN;Sm;0;ON;;;;;N;;;;;
   003E;GREATER-THAN SIGN;Sm;0;ON;;;;;Y;;;;;

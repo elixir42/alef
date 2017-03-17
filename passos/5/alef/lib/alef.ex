@@ -12,8 +12,17 @@ defmodule Alef do
     [codigo_str, nome | _rest] = campos
     nome_alt = Enum.at(campos, 10)
     palavras = tokenizar("#{nome} #{nome_alt}")
-    runa = <<String.to_integer(codigo_str, 16)::utf8>>
+    runa = runa_de_codigo(codigo_str)
     {runa, nome_completo(nome, nome_alt), palavras}
+  end
+
+  defp runa_de_codigo(codigo_str) do
+    codigo = String.to_integer(codigo_str, 16)
+    try do
+      <<codigo::utf8>>
+    rescue
+      ArgumentError -> <<0xfffd::utf8>>  # U+FFFD � REPLACEMENT CHARACTER
+    end
   end
 
   def tokenizar(texto) do
@@ -47,11 +56,15 @@ defmodule Alef do
     end
   end
 
+  def caminho_UCD, do: System.user_home() <> "/UnicodeData.txt"
+
   def main(argv) do
-    argv
-    |> Enum.join(" ")
-    |> String.upcase
-    |> IO.puts
+    consulta = argv
+            |> Enum.join(" ")
+            |> String.upcase
+    ucd = caminho_UCD()
+          |> File.open!()
+    IO.inspect(listar(ucd, consulta))
   end
 
 end

@@ -1,41 +1,78 @@
-# Passo 4
+# Passo 5
 
-Criar função `main` e fazê-la exibir os argumentos da linha de comando convertidos em caixa alta.
+Fazer função `main` exibir o resultado de `listar`.
 
-## Instruções
+Limitações desse "MVP":
 
-Um programa executável pela linha de comando em Elixir depende do programa [`enscript`](http://erlang.org/doc/man/escript.html) que vem na distribuição padrão de Erlang. O `enscript` executa um binário compilado de BEAM (a VM de Erlang).
+* assume que o arquivo `UnicodeData.txt` está no diretório `$HOME` do usuário
+* saída sem formatação, mostrando resultado "cru" de `listar`
 
-Para o binário de `enscript` ser gerado corretamente, é preciso incluir uma linha no arquivo `mix.exs` na raiz do seu projeto (`alef/`). Veja o comentário marcado com ➊:
+## Debugging
+
+### 1. Incluir chamada `IEx.pry` ➊
 
 ```elixir
-defmodule Alef.Mixfile do
-  use Mix.Project
-
-  def project do
-    [app: :alef,
-     version: "0.1.0",
-     elixir: "~> 1.4",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     escript: [main_module: Alef], # ➊ declara módulo principal
-     deps: deps()]
-  end
-
-  # mais linhas omitidas...
+def main(argv) do
+  import IEx; IEx.pry  # ➊
+  consulta = argv |> Enum.join(" ") |> String.upcase
+  ucd = File.open!(caminho_UCD())
+  IO.inspect(listar(ucd, consulta))
 end
 ```
 
-Em seguida, você compila o projeto e gera o executável com este comando:
-
+### 2. Invocar `iex`:
 
 ```bash
-$ mix escript.build
+$ iex -S mix
 ```
 
-Será gerado um executável com o nome do projeto, `alef`, que você pode rodar:
+### 3. Cutucar o código até achar o problema
+
+```elixir
+pry(2)> Alef.main(["A", "B"])
+Request to pry #PID<0.106.0> at lib/alef.ex:53
+
+
+      def main(argv) do
+        import IEx; IEx.pry
+        consulta = argv |> Enum.join(" ") |> String.upcase
+        ucd = File.open!(caminho_UCD())
+
+Allow? [Yn] y
+
+Interactive Elixir (1.4.2) - press Ctrl+C to exit (type h() ENTER for help)
+pry(1)> Alef.consulta_UCD()
+** (UndefinedFunctionError) function Alef.consulta_UCD/0 is undefined or private
+    (alef) Alef.consulta_UCD()
+pry(1)> Alef.caminho_UCD()
+"/Users/lramalho/UnicodeData.txt"
+pry(2)> ucd = File.open!(Alef.caminho_UCD())
+#PID<0.113.0>
+pry(3)> Alef.listar(ucd, "REGISTERED")
+** (ArgumentError) argument error
+    (alef) lib/alef.ex:15: Alef.analisar_linha/1
+    (alef) lib/alef.ex:40: Alef.listar_rec/3
+pry(3)> linha = IO.read(ucd, :line)
+"DB7F;<Non Private Use High Surrogate, Last>;Cs;0;L;;;;;N;;;;;\n"
+pry(4)>
+```
+
+### 4. Criar um teste que expõe o bug
+
+```elixir
+test "analisar linha com codepoint que não é caractere" do
+  surrogate = "DB7F;<Non Private Use High Surrogate, Last>;Cs;0;L;;;;;N;;;;;"
+  assert {<<0xfffd::utf8>>, "<Non Private Use High Surrogate, Last>", _} =
+    analisar_linha(surrogate)
+  # o caractere devolvido é: U+FFFD � REPLACEMENT CHARACTER
+end
+```
+
+### 5. Resolver o bug e demonstrar o MVP!
 
 ```bash
-$ ./alef um dois três
-UM DOIS TRÊS
+$ ./alef cat eyes
+[{"😸", "GRINNING CAT FACE WITH SMILING EYES"},
+ {"😻", "SMILING CAT FACE WITH HEART-SHAPED EYES"},
+ {"😽", "KISSING CAT FACE WITH CLOSED EYES"}]
 ```
