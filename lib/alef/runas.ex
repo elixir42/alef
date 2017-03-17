@@ -8,7 +8,7 @@ defmodule Alef.Runas do
     nome_alt = Enum.at(campos, 10)
     palavras = tokenizar(nome <> " " <> nome_alt)
     nome = nome_completo(nome, nome_alt)
-    runa = runa_de_codigo(codigo)
+    runa = [codigo |> String.to_integer(16)]
 
     {runa, nome, palavras}
   end
@@ -18,13 +18,6 @@ defmodule Alef.Runas do
     |> String.replace("-", " ")
     |> String.split
     |> MapSet.new
-  end
-
-  defp runa_de_codigo(codigo) do
-    try do
-      <<String.to_integer(codigo, 16)::utf8>>
-    rescue ArgumentError -> " "
-    end
   end
 
   defp nome_completo(nome, ""), do: nome

@@ -6,11 +6,11 @@ defmodule Alef do
   alias Alef.Runas
 
   def formatar_runa({runa, nome}) do
-    <<codigo::utf8>> = runa
 
     codigo_fmt =
-      codigo
-      |> Integer.to_string(16)
+      runa
+      |> List.first()
+      |> Integer.to_string()
       |> String.rjust(4, ?0)
 
     "U+#{codigo_fmt}\t#{runa}\t#{nome}"
