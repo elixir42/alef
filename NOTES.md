@@ -13,3 +13,23 @@ To build a standalone program:
 ```bash
 $ mix escript.build
 ```
+
+## Apparent Inconsistencies
+
+### Invoking anonymous functions
+
+Why the dot in `my_fun.()`?
+
+### One liners with `do`
+
+Suddenly a comma and a colon are required...
+
+
+### Restrictions on guards?
+
+Why so many restrictions on operators and functions that may be used on `when` clauses?
+
+
+### Naming functions in `import`
+
+Why does `import` identify functions `[ myfunc: 1,]` when elsewhere we name them `myfunc/1` (for example, when invoking `Enum.map`)
