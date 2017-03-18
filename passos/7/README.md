@@ -1,71 +1,64 @@
-# Passo 6
+# Passo 7
 
-Formatar a saída da função `main`.
+Fazer o download de `UnicodeData.txt` caso ele não esteja no local configurado.
 
-## Uma falha de design
+## Instalar componentes
 
-Implementei este teste para a formatação de cada linha de resultado que será exibida por `main`:
+### Tesla etc.
 
-```elixir
-  test "formatar resultado simples" do
-    assert "U+0041\tA\tLATIN CAPITAL LETTER A" =
-      formatar({"A", "LATIN CAPITAL LETTER A"})
-  end
-
-```
-
-Com base neste teste, implementei a função `formatar` assim, satisfazendo o teste:
+Para o código cliente HTTP no módulo `Alef.Web` usamos pacote `Tesla`, que depende de `ibrowse`, então é preciso acrescentar linhas no `mix.exs`, função `deps`:
 
 ```elixir
-def formatar({runa, nome}) do
-  <<codigo::utf8>> = runa
-  codigo_fmt = codigo
-            |> Integer.to_string(16)
-            |> String.rjust(4, ?0)
-  "U+#{codigo_fmt}\t#{runa}\t#{nome}"
+defp deps do
+    [{:tesla, "~> 0.6.0"},
+     {:ibrowse, "~> 4.2"}]
 end
 ```
 
-No entanto, ao criar um teste de formatação para os gremlins (um gremlin é um caractere inválido), descobri um erro cometido lá no passo 1. Veja o teste e o erro:
+Também é preciso registrar o `ibrowse` na função `application`:
+
 
 ```elixir
-test "formatar resultado que não é caractere" do
-  assert "U+DB7F\t�\t<Non Private Use High Surrogate, Last>" =
-    formatar({<<0xFFFD::utf8>>, "<Non Private Use High Surrogate, Last>"})
+def application do
+  # Specify extra applications you'll use from Erlang/Elixir
+  [extra_applications: [:logger, :ibrowse]]
 end
 ```
+
+Na próxima tentativa de rodar os testes, Elixir vai pedir para instalar o gerenciador de pacotes `hex`:
 
 ```bash
 $ mix test
-........
-
-  1) test formatar resultado que não é caractere (AlefTest)
-     test/alef_test.exs:66
-     match (=) failed
-     code:  "U+DB7F\t�\t<Non Private Use High Surrogate, Last>" = formatar({<<65533::utf8>>, "<Non Private Use High Surrogate, Last>"})
-     right: "U+FFFD\t�\t<Non Private Use High Surrogate, Last>"
-     stacktrace:
-       test/alef_test.exs:67: (test)
-
-
-
-Finished in 0.1 seconds
-9 tests, 1 failure
-
-Randomized with seed 287163
+Could not find Hex, which is needed to build dependency :tesla
+Shall I install Hex? (if running non-interactively, use: "mix local.hex --force") [Yn]
 ```
 
-Na realidade, o teste está errado! O resultado correto é o que está lá na primeira linha do `assert`:
+Respondendo `Y` acontece o seguinte:
 
-```elixir
-"U+DB7F\t�\t<Non Private Use High Surrogate, Last>"
+```bash
+* creating /Users/luciano/.mix/archives/hex-0.15.0
+Unchecked dependencies for environment test:
+* tesla (Hex package)
+  the dependency is not available, run "mix deps.get"
+* ibrowse (Hex package)
+  the dependency is not available, run "mix deps.get"
+** (Mix) Can't continue due to errors on dependencies
 ```
 
-Mas para obter esse resultado eu não posso invocar `formatar` com o binário `<<0xFFFD::utf8>>` e sim com `<<0xDB7F::utf8>>`, porém esse binário é inválido, porque `0xDB7F` não é um caractere, portanto não tem representação em UTF-8. O código Unicode U+DB7F é um "surrogate" (substituto), que só pode ser usado como prefixo em uma sequência de códigos, para representar caracteres fora do conjunto Unicode.
+É só fazer como mandam:
 
-O problema foi um erro de projeto que aconteceu lá no passo 1: a função `analisar_linha` não pode retornar um caractere e um nome, e sim um código hexadecimal e um nome. Apenas no último momento antes de exibir esse código hexadecimal deve ser transformado em um caractere, e caso não seja um caractere válido, o caractere U+FFFD (�) deve ser exibido em seu lugar.
+```bash
+$ mix deps.get
+Running dependency resolution...
+Dependency resolution completed:
+  ibrowse 4.4.0
+  tesla 0.6.0
+* Getting tesla (Hex package)
+  Checking package (https://repo.hex.pm/tarballs/tesla-0.6.0.tar)
+  Fetched package
+* Getting ibrowse (Hex package)
+  Checking package (https://repo.hex.pm/tarballs/ibrowse-4.4.0.tar)
+  Fetched package
+```
 
-Então para completar o passo 6 é preciso mudar todos os testes. Mas a implementação fica até mais simples do que antes:
-
-* `analisar_linha`: apagar uma linha e alterar outra
-* `formatar`: apagar três linhas e alterar outras três
+Depois que registrei `:ibrowse` em `application`, ao rodar `mix escript.build` Elixir pediu para instalar `rebar3`, e eu respondi `Y`. Neste ponto todos testes passam e é possível fazer o build do `escript` sem erro.

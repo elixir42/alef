@@ -55,8 +55,6 @@ defmodule Alef do
     end
   end
 
-  def caminho_UCD, do: System.user_home() <> "/UnicodeData.txt"
-
   def formatar({codigo_str, nome}) do
     runa = runa_de_codigo(codigo_str)
     "U+#{codigo_str}\t#{runa}\t#{nome}"
@@ -66,8 +64,7 @@ defmodule Alef do
     consulta = argv
                |> Enum.join(" ")
                |> String.upcase
-    ucd = caminho_UCD()
-          |> File.open!()
+    ucd = Alef.Arquivo.ler()
     listar(ucd, consulta)
     |> Stream.map(&formatar/1)
     |> Enum.join("\n")
