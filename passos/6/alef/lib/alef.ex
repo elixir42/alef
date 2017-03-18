@@ -12,8 +12,7 @@ defmodule Alef do
     [codigo_str, nome | _rest] = campos
     nome_alt = Enum.at(campos, 10)
     palavras = tokenizar("#{nome} #{nome_alt}")
-    runa = runa_de_codigo(codigo_str)
-    {runa, nome_completo(nome, nome_alt), palavras}
+    {codigo_str, nome_completo(nome, nome_alt), palavras}
   end
 
   defp runa_de_codigo(codigo_str) do
@@ -58,21 +57,22 @@ defmodule Alef do
 
   def caminho_UCD, do: System.user_home() <> "/UnicodeData.txt"
 
-  def formatar({runa, nome}) do
-    <<codigo::utf8>> = runa
-    codigo_fmt = codigo
-              |> Integer.to_string(16)
-              |> String.rjust(4, ?0)
-    "U+#{codigo_fmt}\t#{runa}\t#{nome}"
+  def formatar({codigo_str, nome}) do
+    runa = runa_de_codigo(codigo_str)
+    "U+#{codigo_str}\t#{runa}\t#{nome}"
   end
 
   def main(argv) do
     consulta = argv
-            |> Enum.join(" ")
-            |> String.upcase
+               |> Enum.join(" ")
+               |> String.upcase
     ucd = caminho_UCD()
           |> File.open!()
-    IO.inspect(listar(ucd, consulta))
+    listar(ucd, consulta)
+    |> Stream.map(&formatar/1)
+    |> Enum.join("\n")
+    |> IO.puts()
+
   end
 
 end
