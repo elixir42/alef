@@ -4,7 +4,7 @@ defmodule Alef do
   """
 
   @doc """
-  Extrair campos de uma linha de `UncicodeData.txt`
+  Extrair campos de uma linha de `UnicodeData.txt`
   """
 
   def analisar_linha(linha) do
