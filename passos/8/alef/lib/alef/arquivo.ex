@@ -1,14 +1,12 @@
-require Logger
-
 defmodule Alef.Arquivo do
+
   def caminho_UCD do
     System.user_home() <> "/UnicodeData.txt"
   end
 
   def ler do
     unless existe_UCD?() do
-      # @JL: use debug, so it will only print on dev env
-      Logger.debug("#{caminho_UCD()} não encontrado, baixando...")
+      IO.puts("#{caminho_UCD()} não encontrado\nbaixando #{Alef.Web.url_ucd()}")
       %{body: dados} = Alef.Web.baixar()
       caminho_UCD()
       |> salvar(dados)
