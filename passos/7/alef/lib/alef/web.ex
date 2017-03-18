@@ -1,12 +1,11 @@
 defmodule Alef.Web do
   use Tesla
 
-  plug Tesla.Middleware.BaseUrl, "http://www.unicode.org"
-  plug Tesla.Middleware.Headers, %{"User-agent" => "Elixir lab0@ramalho.org"}
+  @ucd_url "http://www.unicode.org/Public/UNIDATA/UnicodeData.txt"
 
   adapter Tesla.Adapter.Ibrowse
 
   def baixar() do
-    get("/Public/UNIDATA/UnicodeData.txt")
+    get(@ucd_url)
   end
 end
