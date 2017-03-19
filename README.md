@@ -24,7 +24,7 @@ __Nota__: `alef` precisa de uma cópia de [`UnicodeData.txt`](http://www.unicode
 
 ## Rodar testes
 
-Para executar os testes, execute dentro do diretório `alef/` (onde fica o `mix.exs`):
+Para executar os testes, execute no diretório do projeto (onde fica o arquitvo `alef/mix.exs`):
 
 ```bash
 $ mix test
@@ -41,7 +41,7 @@ Randomized with seed 325308
 
 ## Gerar executável
 
-Para contruir o executável `alef`, execute dentro do diretório `alef/` (onde fica o `mix.exs`):
+Para construir o executável `alef`, execute no diretório do projeto:
 
 ```bash
 $ mix escript.build
