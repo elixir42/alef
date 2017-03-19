@@ -1,13 +1,13 @@
 # Alef
 
-Elixir CLI utility to find Unicode Characters.
+Utilitário de linha de comanto para encontrar caracteres Unicode pelo nome.
 
-Elixir is an arabic word, and alef is the name of the first arabic letter.
+Porque _alef_: _elixir_ é uma palavra de origem árabe, e a primeira letra do alfabeto árabe é ا (alef)
 
 
-## Using
+## Como usar
 
-`alef` lets you find Unicode characters by name. To use, provide one or more words as command-line arguments:
+Fara usar `alef`, forneça uma ou mais palavras como argumentos na linha de comando:
 
 ```bash
 $ ./alef chess queen
@@ -19,12 +19,12 @@ U+1F63B	😻	SMILING CAT FACE WITH HEART-SHAPED EYES
 U+1F63D	😽	KISSING CAT FACE WITH CLOSED EYES
 ```
 
-__Note__: `alef` needs a copy of the `UnicodeData.txt` file which you need to download from [unicode.org](http://www.unicode.org/Public/UNIDATA/UnicodeData.txt) and save in your home directory. The next version of `alef` will do that automatically, but this MVP doesn't.
+__Nota__: `alef` precisa de uma cópia de [`UnicodeData.txt`](http://www.unicode.org/Public/UNIDATA/UnicodeData.txt). Somente no [passo 7](https://github.com/ramalho/alef/tree/master/passos/7) do dojo implementamos o download. Entre os passos 5 e 6 o programa precisa encontrar arquivo [`UnicodeData.txt`](http://www.unicode.org/Public/UNIDATA/UnicodeData.txt) no diretório `$HOME` do usuário.
 
 
-## Testing and building
+## Rodar testes
 
-To run the tests:
+Para executar os testes, execute dentro do diretório `alef/` (onde fica o `mix.exs`):
 
 ```bash
 $ mix test
@@ -38,7 +38,10 @@ Finished in 0.06 seconds
 Randomized with seed 325308
 ```
 
-To build the `alef` executable:
+
+## Gerar executável
+
+Para contruir o executável `alef`, execute dentro do diretório `alef/` (onde fica o `mix.exs`):
 
 ```bash
 $ mix escript.build
@@ -49,4 +52,4 @@ $ ls -lah alef
 -rwxr-xr-x  1 lramalho  staff   2.7M Mar 15 14:29 alef
 ```
 
-__Note__: the `alef` binary depends on the `escript` program that comes with the Erlang distribution.
+__Nota__: o executável `alef` depende do programa `escript` que vem com a distribuição Erlang.
