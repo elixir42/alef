@@ -34,25 +34,20 @@ defmodule Alef do
   defp nome_completo(nome, ""), do: nome
   defp nome_completo(nome, nome_alt), do: "#{nome} (#{nome_alt})"
 
-  def listar(arq, consulta_str) do
-    consulta = tokenizar(consulta_str)
-    listar_rec(arq, consulta, [])
+  def listar(arquivo, consulta_str) do
+    consulta_str
+    |> tokenizar
+    |> filtrar(arquivo)
   end
 
-  defp listar_rec(arq, consulta, resultados) do
-    linha = IO.read(arq, :line)
-
-    if (linha == :eof) do
-      Enum.reverse(resultados)
-    else
-      {runa, nome, palavras} = analisar_linha(linha)
-
-      if MapSet.subset?(consulta, palavras) do
-        listar_rec(arq, consulta, [{runa, nome}|resultados])
-      else
-        listar_rec(arq, consulta, resultados)
-      end
-    end
+  defp filtrar(consulta, arquivo) do
+    IO.stream(arquivo, :line)
+    |> Stream.map(&analisar_linha/1)
+    |> Stream.filter(fn {_, _, palavras} ->
+                        MapSet.subset?(consulta, palavras)
+                     end)
+    |> Stream.map(fn {runa, nome,_} -> {runa, nome} end)
+    |> Enum.to_list
   end
 
   def formatar({codigo_str, nome}) do

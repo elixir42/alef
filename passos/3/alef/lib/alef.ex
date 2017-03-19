@@ -29,15 +29,15 @@ defmodule Alef do
   def listar(arquivo, consulta_str) do
     consulta_str
     |> tokenizar
-    |> listar_rec(arquivo)
+    |> filtrar(arquivo)
   end
 
-  defp listar_rec(consulta, arquivo) do
+  defp filtrar(consulta, arquivo) do
     IO.stream(arquivo, :line)
     |> Stream.map(&analisar_linha/1)
-    |> Stream.filter(fn {_,_,palavras} ->
-      MapSet.subset?(consulta, palavras)
-    end)
+    |> Stream.filter(fn {_, _, palavras} ->
+                        MapSet.subset?(consulta, palavras)
+                     end)
     |> Stream.map(fn {runa, nome,_} -> {runa, nome} end)
     |> Enum.to_list
   end
